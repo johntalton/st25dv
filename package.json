@@ -1,0 +1,12 @@
+{
+  "name": "@johntalton/st25dv",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [ "./src/**/*.js"],
+  "scripts": {
+
+  }
+}
