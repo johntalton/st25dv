@@ -6,7 +6,7 @@
     ".": "./src/index.js"
   },
   "files": [ "./src/**/*.js"],
-  "scripts": {
-
+  "dependencies": {
+    "@johntalton/bitsmush": "^1.0.2"
   }
 }
