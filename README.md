@@ -1,7 +1,6 @@
 # ST25DV
 
 ![CI](https://github.com/johntalton/st25dv/workflows/CI/badge.svg)
-![GitHub](https://img.shields.io/github/license/johntalton/st25dv)
 
 Dynamic NFC/RFID tag javascript driver over abstracted [`I2CBus`](https://github.com/johntalton/and-other-delights) implementation.
 

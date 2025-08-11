@@ -8,6 +8,7 @@ import {
 	UID_MAGIC,
 	UID_MANUFACTURE_CODE_ST
 } from './defs.js'
+import { SYSTEM_CONFIG_REGISTERS_BULK } from './registers.js'
 
 /**
  * @import { SmushMap } from '@johntalton/bitsmush
@@ -18,6 +19,7 @@ import {
  * InterruptionTime,
  * AreaRFAccess,
  * EHMode,
+ * RFManagement,
  * AreaEnd,
  * AreaI2CAccess,
  * CCFile,
@@ -27,7 +29,9 @@ import {
  * DSFIDLock,
  * AFILock,
  * ICReference,
- * UID
+ * UID,
+ * BulkAreas,
+ * BulkInfo
  * } from "./defs.js"
  */
 
@@ -134,14 +138,14 @@ export class Converter {
 		] = decode(buffer, SMUSH_MAP_GPO)
 
 		return {
-			RF_USER_EN,
-			RF_ACTIVITY_EN,
-			RF_INTERRUPT_EN,
-			FIELD_CHANGE_EN,
-			RF_PUT_MSG_EN,
-			RF_GET_MSG_EN,
-			RF_WRITE_EN,
-			GPO_EN
+			rfUserEnabled: RF_USER_EN === 1,
+			rfActivityEnabled: RF_ACTIVITY_EN === 1,
+			rfInterruptEnabled: RF_INTERRUPT_EN === 1,
+			fieldChangedEnabled: FIELD_CHANGE_EN === 1,
+			rfPutEnabled: RF_PUT_MSG_EN === 1,
+			rfGetEnabled: RF_GET_MSG_EN === 1,
+			rfWriteEnabled: RF_WRITE_EN === 1,
+			gpoEnabled: GPO_EN === 1
 		}
 	}
 
@@ -181,11 +185,11 @@ export class Converter {
 	static decodeInterruptionTime(buffer) {
 		const [ IT_TIME ] = decode(buffer, SMUSH_MAP_IT_TIME)
 
-		const timeUs = 301 - IT_TIME * 37.65
+		const interruptionTimeUs = 301 - IT_TIME * 37.65
 
 		return {
 			IT_TIME,
-			timeUs
+			interruptionTimeUs
 		}
 	}
 
@@ -218,14 +222,14 @@ export class Converter {
 
 	/**
 	 * @param {ArrayBuffer|ArrayBufferView} buffer
-	 * @return
+	 * @return {RFManagement}
 	 */
 	static decodeRFManagement(buffer) {
 		const [ RF_DISABLE, RF_SLEEP ] = decode(buffer, SMUSH_MAP_RF_MANAGEMENT)
 
 		return {
-			RF_DISABLE,
-			RF_SLEEP
+			rfDisabled: RF_DISABLE === 1,
+			rfSleep: RF_SLEEP === 1
 		}
 	}
 
@@ -236,6 +240,57 @@ export class Converter {
 
 		const data = 0
 		return Uint8Array.from([ data ])
+	}
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @returns {BulkAreas}
+	 */
+	static decodeAreas(buffer) {
+		const u8 = ArrayBuffer.isView(buffer) ?
+			new Uint8Array(buffer.buffer, buffer.byteOffset, SYSTEM_CONFIG_REGISTERS_BULK.AREAS.LENGTH) :
+			new Uint8Array(buffer, 0, SYSTEM_CONFIG_REGISTERS_BULK.AREAS.LENGTH)
+
+
+		const area1Access = u8.subarray(0, 1)
+		const area1end = u8.subarray(1, 2)
+		const area2Access = u8.subarray(2, 3)
+		const area2end = u8.subarray(3, 4)
+		const area3Access = u8.subarray(4, 5)
+		const area3end = u8.subarray(5, 6)
+		const area4Access = u8.subarray(6, 7)
+		const i2caAccess = u8.subarray(7, 8)
+
+		const {
+			protection1,
+			protection2,
+			protection3,
+			protection4
+		} = Converter.decodeI2CAccess(i2caAccess)
+
+		return {
+			area1: {
+				rfAccess: Converter.decodeArea1RFAccess(area1Access),
+				end: Converter.decodeArea1End(area1end),
+				i2cProtection: protection1
+			},
+			area2: {
+				rfAccess: Converter.decodeArea2RFAccess(area2Access),
+				end: Converter.decodeArea2End(area2end),
+				i2cProtection: protection2
+			},
+			area3: {
+				rfAccess: Converter.decodeArea3RFAccess(area3Access),
+				end: Converter.decodeArea3End(area3end),
+				i2cProtection: protection3
+			},
+			area4: {
+				rfAccess: Converter.decodeArea4RFAccess(area4Access),
+				end: undefined,
+				i2cProtection: protection4
+			}
+		}
+
 	}
 
 	/**
@@ -496,6 +551,36 @@ export class Converter {
 	static decodeLockAFI(buffer) {
 		const [ lock ] = decode(buffer, SMUSH_MAP_AFI_LOCK)
 		return lock
+	}
+
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @returns {BulkInfo}
+	 */
+	static decodeInfo(buffer) {
+		const u8 = ArrayBuffer.isView(buffer) ?
+			new Uint8Array(buffer.buffer, buffer.byteOffset, SYSTEM_CONFIG_REGISTERS_BULK.INFO.LENGTH) :
+			new Uint8Array(buffer, 0, SYSTEM_CONFIG_REGISTERS_BULK.INFO.LENGTH)
+
+
+		const dsfid = u8.subarray(0, 1)
+		const afi = u8.subarray(1, 2)
+		const memorySize = u8.subarray(2, 4)
+		const blockSize = u8.subarray(4, 5)
+		const icRef = u8.subarray(5, 6)
+		const uid = u8.subarray(6, 14)
+		const icRev = u8.subarray(15, 16)
+
+		return {
+			dsfId: Converter.decodeDSFID(dsfid),
+			afi: Converter.decodeAFI(afi),
+			memorySize: Converter.decodeMemorySize(memorySize),
+			blockSize: Converter.decodeBlockSize(blockSize),
+			icReference: Converter.decodeICReference(icRef),
+			uid: Converter.decodeUID(uid),
+			icRevision: Converter.decodeRevision(icRev)
+		}
 	}
 
 		/**

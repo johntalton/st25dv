@@ -5,6 +5,9 @@ export class ST25DVUser {
 	#bus
 
 	constructor(bus) { this.#bus = bus }
+
+
+
 }
 
 export class ST25DVSystem {
@@ -15,6 +18,10 @@ export class ST25DVSystem {
 	async getGPO() {
 		const ab = await CommonSystem.getGPO(this.#bus)
 		return Converter.decodeGPO(ab)
+	}
+
+	async setGPO(value) {
+		return CommonSystem.setGPO(this.#bus, Converter.encodeGPO(value))
 	}
 
 	async getInterruptionTime() {
@@ -42,6 +49,11 @@ export class ST25DVSystem {
 
 	async setRFManagement(value) {
 		return CommonSystem.setRFManagement(this.#bus, Converter.encodeRFManagement(value))
+	}
+
+	async getAreas() {
+		const ab = await CommonSystem.getAreas(this.#bus)
+		return Converter.decodeAreas(ab)
 	}
 
 	async getArea1RFAccess() {
@@ -160,6 +172,11 @@ export class ST25DVSystem {
 	async getLockAFI() {
 		const ab = await CommonSystem.getLockAFI(this.#bus)
 		return Converter.decodeLockAFI(ab)
+	}
+
+	async getInfo() {
+		const ab = await CommonSystem.getInfo(this.#bus)
+		return Converter.decodeInfo(ab)
 	}
 
 	async getDSFID() {

@@ -5,7 +5,7 @@ import {
 	LENGTH_UID,
 } from './defs.js'
 
-import { SYSTEM_CONFIG_REGISTERS } from './registers.js'
+import { SYSTEM_CONFIG_REGISTERS, SYSTEM_CONFIG_REGISTERS_BULK } from './registers.js'
 
 export class CommonSystem {
 	static async getGPO(bus) {
@@ -38,6 +38,10 @@ export class CommonSystem {
 
 	static async setRFManagement(bus, buffer) {
 		return bus.writeI2cBlock(SYSTEM_CONFIG_REGISTERS.RF_MNGT, buffer)
+	}
+
+	static async getAreas(bus) {
+		return bus.readI2cBlock(SYSTEM_CONFIG_REGISTERS_BULK.AREAS.ADDRESS, SYSTEM_CONFIG_REGISTERS_BULK.AREAS.LENGTH)
 	}
 
 	static async getArea1RFAccess(bus) {
@@ -134,6 +138,10 @@ export class CommonSystem {
 
 	static async setLockConfiguration(bus, buffer) {
 		return bus.writeI2cBlock(SYSTEM_CONFIG_REGISTERS.LOCK_CFG, buffer)
+	}
+
+	static async getInfo(bus) {
+		return bus.readI2cBlock(SYSTEM_CONFIG_REGISTERS_BULK.INFO.ADDRESS, SYSTEM_CONFIG_REGISTERS_BULK.INFO.LENGTH)
 	}
 
 	static async getLockDSFID(bus) {

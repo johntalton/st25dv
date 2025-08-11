@@ -8,8 +8,22 @@ export const LENGTH_MEM_SIZE = 2
 export const LENGTH_I2C_PASSWORD = 8
 
 
-/** @typedef {never} GPO */
-/** @typedef {never} InterruptionTime */
+/**
+ * @typedef {Object} GPO
+ * @property {boolean} rfUserEnabled
+ * @property {boolean} rfActivityEnabled
+ * @property {boolean} rfInterruptEnabled
+ * @property {boolean} fieldChangedEnabled
+ * @property {boolean} rfPutEnabled
+ * @property {boolean} rfGetEnabled
+ * @property {boolean} rfWriteEnabled
+ * @property {boolean} gpoEnabled
+ */
+
+/** @typedef {Object} InterruptionTime
+ * @property {number} IT_TIME
+ * @property {number} interruptionTimeUs
+*/
 
 /** @typedef {number} EHMode */
 
@@ -18,6 +32,13 @@ export const ENERGY_HARVEST = {
 	FORCE_AFTER_BOOT: 0,
 	ON_DEMAND: 1
 }
+
+/**
+ * @typedef {Object} RFManagement
+ * @property {boolean} rfDisabled
+ * @property {boolean} rfSleep
+ */
+
 
 /** @enum {number} */
 export const AREA_RF_PASSWORD_CONTROL = {
@@ -166,4 +187,30 @@ export const UID_PRODUCT_CODE = {
  * @property {UID_MAGIC} magic
  * @property {UID_MANUFACTURE_CODE_ST} manufacture
  * @property {UID_PRODUCT_CODE} product
+ */
+
+/**
+ * @typedef {Object} BulkArea
+ * @property {AreaRFAccess} rfAccess
+ * @property {AreaEnd|undefined} end
+ * @property {AreaI2CProtection} i2cProtection
+ */
+
+/**
+ * @typedef {Object} BulkAreas
+ * @property {BulkArea} area1
+ * @property {BulkArea} area2
+ * @property {BulkArea} area3
+ * @property {BulkArea} area4
+ */
+
+/**
+ * @typedef {Object} BulkInfo
+ * @property {number} dsfId
+ * @property {number} afi
+ * @property {number} memorySize
+ * @property {number} blockSize
+ * @property {ICReference} icReference
+ * @property {UID} uid
+ * @property {number} icRevision
  */
