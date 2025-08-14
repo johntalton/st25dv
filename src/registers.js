@@ -1,7 +1,10 @@
 
 const SINGLE_BYTE_MASK = 0xFF
 
-function split16(reg16) {
+/**
+ * @returns {[ number, number ]}
+ */
+export function split16(reg16) {
 	return [
 		(reg16 >> 8) & SINGLE_BYTE_MASK,
 		reg16 & SINGLE_BYTE_MASK
@@ -43,7 +46,7 @@ export const SYSTEM_CONFIG_REGISTERS = {
 	// RESERVED: 0x0023
 
   // Read Write
-	I2C_PWD:     0x0900 // end 0x0907
+	I2C_PWD:     split16(0x0900) // end 0x0907
 }
 
 export const SYSTEM_CONFIG_REGISTERS_BULK = {
@@ -60,10 +63,7 @@ export const SYSTEM_CONFIG_REGISTERS_BULK = {
 
 // E2 === 0
 export const DYNAMIC_REGISTERS = {
-  USER_MEM_START:   split16(0x0000),
-  USER_MEM_END_04K: split16(0x01FF),
-  USER_MEM_END_16K: split16(0x07FF),
-  USER_MEM_END_64K: split16(0x1FFF),
+	// USER_MEM_START: split16(0x0000)
 
 	GPO_CTRL: split16(0x2000),
 	// RESERVED: split16(0x20001),
@@ -75,6 +75,16 @@ export const DYNAMIC_REGISTERS = {
 	MB_LEN:   split16(0x2007), // Readonly
 
 	// mailbox
-	MB_START: split16(0x2008),
-	MB_END:   split16(0x2107)
+	// MB_START: split16(0x2008),
+	// MB_END:   split16(0x2107)
 }
+
+export const DYNAMIC_REGISTERS_BULK = {
+	STATUS: {
+		ADDRESS: DYNAMIC_REGISTERS.I2C_SSO,
+		LENGTH: 4
+	}
+}
+
+export const USER_MEM_START = 0x0000
+export const MAILBOX_MEM_START = 0x2008

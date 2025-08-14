@@ -2,6 +2,9 @@
 export const DEFAULT_ST25DV_USER_ADDRESS = 0x53
 export const DEFAULT_ST25DV_SYSTEM_ADDRESS = 0x57
 
+export const PASSWORD_PRESENT_VALIDATION_CODE = 0x09
+export const PASSWORD_SET_VALIDATION_CODE = 0x07
+
 export const LENGTH_SINGLE_BYTE = 1
 export const LENGTH_UID = 8
 export const LENGTH_MEM_SIZE = 2
@@ -213,4 +216,54 @@ export const UID_PRODUCT_CODE = {
  * @property {ICReference} icReference
  * @property {UID} uid
  * @property {number} icRevision
+ */
+
+
+
+/**
+ * @typedef {Object} EnergyHarvestingControl
+ * @property {boolean} enableHarvesting
+ * @property {boolean} harvestingOn
+ * @property {boolean} fieldOn
+ * @property {boolean} vccOn
+ */
+
+
+/** @enum {number} */
+export const I2C_SECURITY_STATUS = {
+	SESSION_CLOSED: 0,
+	SESSION_OPEN: 1
+}
+
+/** @typedef {I2C_SECURITY_STATUS} I2CSecurityStatus */
+
+/**
+ * @typedef {Object} InterruptStatus
+ * @property {boolean} rfUser
+ * @property {boolean} rfActivity
+ * @property {boolean} rfInterrupt
+ * @property {boolean} fieldFalling
+ * @property {boolean} fieldRising
+ * @property {boolean} rfPutMessage
+ * @property {boolean} rfGetMessage
+ * @property {boolean} rfWrite
+ */
+
+/**
+ * @typedef {Object} MailboxControl
+ * @property {boolean} mailboxEnabled
+ * @property {boolean} hostPutMessage
+ * @property {boolean} rfPutMessage
+ * @property {boolean} hostMissedMessage
+ * @property {boolean} rfMissedMessage
+ * @property {boolean} currentFromRF
+ * @property {boolean} currentFromHost
+ */
+
+/**
+ * @typedef {Object} Status
+ * @property {I2CSecurityStatus} i2cSecurityStatus
+ * @property {InterruptStatus} interruptionStatus
+ * @property {MailboxControl} mailboxControl
+ * @property {number} mailboxLength
  */

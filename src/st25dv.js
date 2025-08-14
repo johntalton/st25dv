@@ -1,4 +1,5 @@
 import { CommonSystem } from './common_system.js'
+import { CommonUser } from './common_user.js'
 import { Converter } from './converter.js'
 
 export class ST25DVUser {
@@ -6,8 +7,77 @@ export class ST25DVUser {
 
 	constructor(bus) { this.#bus = bus }
 
+	async getGPO() {
+		const ab = await CommonUser.getGPO(this.#bus)
+		return Converter.decodeGPO(ab)
+	}
 
+	async setGPO(value) {
+		return CommonUser.setGPO(this.#bus, Converter.encodeGPO(value))
+	}
 
+	async getEnergyHarvestingControl() {
+		const ab = await CommonUser.getEnergyHarvestingControl(this.#bus)
+		return Converter.decodeEnergyHarvestingControl(ab)
+	}
+
+	async setEnergyHarvestingControl(control) {
+		return CommonUser.setEnergyHarvestingControl(this.#bus, Converter.encodeEnergyHarvestingControl(control))
+	}
+
+	async getRFManagement() {
+		const ab = await CommonUser.getRFManagement(this.#bus)
+		return Converter.decodeRFManagement(ab)
+	}
+
+	async setRFManagement(value) {
+		return CommonUser.setRFManagement(this.#bus, Converter.encodeRFManagement(value))
+	}
+
+	async getStatus() {
+		const ab = await CommonUser.getStatus(this.#bus)
+		return Converter.decodeStatus(ab)
+	}
+
+	async getI2CSecurityStatus() {
+		const ab = await CommonUser.getI2CSecurityStatus(this.#bus)
+		return Converter.decodeI2CSecurityStatus(ab)
+	}
+
+	async getInterruptStatus() {
+		const ab = await CommonUser.getInterruptStatus(this.#bus)
+		return Converter.decodeInterruptStatus(ab)
+	}
+
+	async getMailboxControl() {
+		const ab = await CommonUser.getMailboxControl(this.#bus)
+		return Converter.decodeMailboxControl(ab)
+	}
+
+	async setMailboxControl(value) {
+		return CommonUser.setMailboxControl(this.#bus, Converter.encodeMailboxControl(value))
+	}
+
+	async getMailboxLength() {
+		const ab = await CommonUser.getMailboxLength(this.#bus)
+		return Converter.decodeMailboxLength(ab)
+	}
+
+	async readMemory(address, length, into = undefined) {
+		return CommonUser.readMemory(this.#bus, address, length, into)
+	}
+
+	async writeMemory(address, buffer) {
+		return CommonUser.writeMemory(this.#bus, address, buffer)
+	}
+
+	async readMailbox(address, length) {
+		return CommonUser.readMailbox(this.#bus, address, length)
+	}
+
+	async writeMailbox(address, buffer) {
+		return CommonUser.writeMailbox(this.#bus, address, buffer)
+	}
 }
 
 export class ST25DVSystem {
@@ -219,8 +289,8 @@ export class ST25DVSystem {
 		return Converter.decodeI2CPassword(ab)
 	}
 
-	async setI2CPassword(value) {
-		return CommonSystem.setI2CPassword(this.#bus, Converter.encodeI2CPassword(value))
+	async setI2CPassword(value, present = false) {
+		return CommonSystem.setI2CPassword(this.#bus, Converter.encodeI2CPassword(value, present))
 	}
 }
 

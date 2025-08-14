@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./ndef": "./src/ndef/index.js"
   },
   "files": [ "./src/**/*.js"],
   "dependencies": {
     "@johntalton/bitsmush": "^1.0.2"
+  },
+  "devDependencies": {
+    "@johntalton/and-other-delights": "^8.5.3"
   }
 }

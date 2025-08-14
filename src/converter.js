@@ -5,13 +5,17 @@ import {
 	LENGTH_MEM_SIZE,
 	LENGTH_SINGLE_BYTE,
 	LENGTH_UID,
+	PASSWORD_PRESENT_VALIDATION_CODE,
+	PASSWORD_SET_VALIDATION_CODE,
 	UID_MAGIC,
 	UID_MANUFACTURE_CODE_ST
 } from './defs.js'
-import { SYSTEM_CONFIG_REGISTERS_BULK } from './registers.js'
+import { DYNAMIC_REGISTERS_BULK, SYSTEM_CONFIG_REGISTERS_BULK } from './registers.js'
+
+const BIT_SET = 1
 
 /**
- * @import { SmushMap } from '@johntalton/bitsmush
+ * @import { SmushMap } from '@johntalton/bitsmush'
  */
 
 /** @import {
@@ -31,23 +35,27 @@ import { SYSTEM_CONFIG_REGISTERS_BULK } from './registers.js'
  * ICReference,
  * UID,
  * BulkAreas,
- * BulkInfo
+ * BulkInfo,
+ * EnergyHarvestingControl,
+ * I2CSecurityStatus,
+ * InterruptStatus,
+ * MailboxControl,
+ * Status
  * } from "./defs.js"
  */
 
 
 /** @type {SmushMap} */
 export const SMUSH_MAP_GPO = [
-	 [ 0, 1 ],
-	 [ 1, 1 ],
-	 [ 2, 1 ],
-	 [ 3, 1 ],
-	 [ 4, 1 ],
-	 [ 5, 1 ],
-	 [ 6, 1 ],
-	 [ 7, 1 ],
-	]
-
+	[ 0, 1 ],
+	[ 1, 1 ],
+	[ 2, 1 ],
+	[ 3, 1 ],
+	[ 4, 1 ],
+	[ 5, 1 ],
+	[ 6, 1 ],
+	[ 7, 1 ]
+]
 
 /** @type {SmushMap} */
 export const SMUSH_MAP_IT_TIME = [ [ 2, 3 ] ]
@@ -97,7 +105,40 @@ export const SMUSH_MAP_DSFID_LOCK = [ [ 0, 1 ] ]
 /** @type {SmushMap} */
 export const SMUSH_MAP_AFI_LOCK = [ [ 0, 1 ] ]
 
+/** @type {SmushMap} */
+export const SMUSH_MAP_ENERGY_HARVEST_CONTROL = [
+	[ 0, 1 ],
+	[ 1, 1 ],
+	[ 2, 1 ],
+	[ 3, 1 ]
+]
 
+/** @type {SmushMap} */
+export const SMUSH_MAP_I2C_SECURITY_STATUS = [ [ 0, 1 ] ]
+
+/** @type {SmushMap} */
+export const SMUSH_MAP_INTERRUPTION_STATUS = [
+	[ 0, 1 ],
+	[ 1, 1 ],
+	[ 2, 1 ],
+	[ 3, 1 ],
+	[ 4, 1 ],
+	[ 5, 1 ],
+	[ 6, 1 ],
+	[ 7, 1 ]
+]
+
+/** @type {SmushMap} */
+export const SMUSH_MAP_MAILBOX_CONTROL = [
+	[ 0, 1 ],
+	[ 1, 1 ],
+	[ 2, 1 ],
+	// Reserved
+	[ 4, 1 ],
+	[ 5, 1 ],
+	[ 6, 1 ],
+	[ 7, 1 ]
+]
 
 function decode(buffer, smushMap) {
 	const u8 = ArrayBuffer.isView(buffer) ?
@@ -138,14 +179,14 @@ export class Converter {
 		] = decode(buffer, SMUSH_MAP_GPO)
 
 		return {
-			rfUserEnabled: RF_USER_EN === 1,
-			rfActivityEnabled: RF_ACTIVITY_EN === 1,
-			rfInterruptEnabled: RF_INTERRUPT_EN === 1,
-			fieldChangedEnabled: FIELD_CHANGE_EN === 1,
-			rfPutEnabled: RF_PUT_MSG_EN === 1,
-			rfGetEnabled: RF_GET_MSG_EN === 1,
-			rfWriteEnabled: RF_WRITE_EN === 1,
-			gpoEnabled: GPO_EN === 1
+			rfUserEnabled: RF_USER_EN === BIT_SET,
+			rfActivityEnabled: RF_ACTIVITY_EN === BIT_SET,
+			rfInterruptEnabled: RF_INTERRUPT_EN === BIT_SET,
+			fieldChangedEnabled: FIELD_CHANGE_EN === BIT_SET,
+			rfPutEnabled: RF_PUT_MSG_EN === BIT_SET,
+			rfGetEnabled: RF_GET_MSG_EN === BIT_SET,
+			rfWriteEnabled: RF_WRITE_EN === BIT_SET,
+			gpoEnabled: GPO_EN === BIT_SET
 		}
 	}
 
@@ -222,14 +263,43 @@ export class Converter {
 
 	/**
 	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @returns {EnergyHarvestingControl}
+	 */
+	static decodeEnergyHarvestingControl(buffer) {
+		const [
+			EH_EN,
+			EH_ON,
+			FIELD_ON,
+			VCC_ON
+		] = decode(buffer, SMUSH_MAP_ENERGY_HARVEST_CONTROL)
+
+		return {
+			enableHarvesting: EH_EN === BIT_SET,
+			harvestingOn: EH_ON === BIT_SET,
+			fieldOn: FIELD_ON === BIT_SET,
+			vccOn: VCC_ON === BIT_SET
+		}
+	}
+
+	/**
+	 * @param {EnergyHarvestingControl} control
+	 * @returns ArrayBuffer|ArrayBufferView
+	 */
+	static encodeEnergyHarvestingControl(control) {
+		throw new Error('no implementation')
+	}
+
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
 	 * @return {RFManagement}
 	 */
 	static decodeRFManagement(buffer) {
 		const [ RF_DISABLE, RF_SLEEP ] = decode(buffer, SMUSH_MAP_RF_MANAGEMENT)
 
 		return {
-			rfDisabled: RF_DISABLE === 1,
-			rfSleep: RF_SLEEP === 1
+			rfDisabled: RF_DISABLE === BIT_SET,
+			rfSleep: RF_SLEEP === BIT_SET
 		}
 	}
 
@@ -237,7 +307,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeRFManagement(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -309,7 +379,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea1RFAccess(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -326,7 +396,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea1End(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -347,7 +417,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea2RFAccess(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -364,7 +434,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea2End(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -385,7 +455,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea3RFAccess(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -402,7 +472,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea3End(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -423,7 +493,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeArea4RFAccess(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -452,7 +522,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeI2CAccess(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -473,7 +543,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeLockCCFile(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -488,10 +558,11 @@ export class Converter {
 	}
 
 	/**
+	 * @param {MailboxMode} value
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeMailboxMode(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -512,7 +583,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeMailboxWatchdog(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -530,7 +601,7 @@ export class Converter {
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
 	static encodeLockConfiguration(value) {
-
+		throw new Error('no implementation')
 		const data = 0
 		return Uint8Array.from([ data ])
 	}
@@ -583,7 +654,7 @@ export class Converter {
 		}
 	}
 
-		/**
+	/**
 	 * @param {ArrayBuffer|ArrayBufferView} buffer
 	 * @return {number}
 	 */
@@ -700,14 +771,124 @@ export class Converter {
 	/**
 	 * @returns {ArrayBuffer|ArrayBufferView}
 	 */
-	static encodeI2CPassword(value) {
-		const u8 = new Uint8Array(LENGTH_I2C_PASSWORD)
+	static encodeI2CPassword(value, present) {
+		if(!Array.isArray(value)) { throw new Error('password must be an array') }
+		if(value.length !== LENGTH_I2C_PASSWORD) { throw new Error('invalid password length') }
 
-		return u8
+		const validationCode = present ? PASSWORD_PRESENT_VALIDATION_CODE : PASSWORD_SET_VALIDATION_CODE
+
+		return Uint8ClampedArray.of(...value, validationCode, ...value)
 	}
 
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @return {Status}
+	 */
+	static decodeStatus(buffer) {
+		const u8 = ArrayBuffer.isView(buffer) ?
+			new Uint8Array(buffer.buffer, buffer.byteOffset, DYNAMIC_REGISTERS_BULK.STATUS.LENGTH) :
+			new Uint8Array(buffer, 0, DYNAMIC_REGISTERS_BULK.STATUS.LENGTH)
 
 
+		const i2cSecurity = u8.subarray(0, 1)
+		const itStatus = u8.subarray(1, 2)
+		const mbControl = u8.subarray(1, 2)
+		const mbLength = u8.subarray(1, 2)
 
+		return {
+			i2cSecurityStatus: Converter.decodeI2CSecurityStatus(i2cSecurity),
+			interruptionStatus: Converter.decodeInterruptStatus(itStatus),
+			mailboxControl: Converter.decodeMailboxControl(mbControl),
+			mailboxLength: Converter.decodeMailboxLength(mbLength)
+		}
+	}
 
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @return {I2CSecurityStatus}
+	 */
+	static decodeI2CSecurityStatus(buffer) {
+		const [
+			status
+		] = decode(buffer, SMUSH_MAP_I2C_SECURITY_STATUS)
+
+		return status
+	}
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @return {InterruptStatus}
+	 */
+	static decodeInterruptStatus(buffer) {
+		const [
+			RF_USER,
+			RF_ACTIVITY,
+			RF_INTERRUPT,
+			FIELD_FALLING,
+			FIELD_RISING,
+			RF_PUT_MSG,
+			RF_GET_MSG,
+			RF_WRITE
+		] = decode(buffer, SMUSH_MAP_INTERRUPTION_STATUS)
+
+		return {
+			rfUser: RF_USER === BIT_SET,
+			rfActivity: RF_ACTIVITY === BIT_SET,
+			rfInterrupt: RF_INTERRUPT === BIT_SET,
+			fieldFalling: FIELD_FALLING === BIT_SET,
+			fieldRising: FIELD_RISING === BIT_SET,
+			rfPutMessage: RF_PUT_MSG === BIT_SET,
+			rfGetMessage: RF_GET_MSG === BIT_SET,
+			rfWrite: RF_WRITE === BIT_SET
+		}
+	}
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @return {MailboxControl}
+	 */
+	static decodeMailboxControl(buffer) {
+		const [
+			MB_EN,
+			HOST_PUT_MSG,
+			RF_PUT_MSG,
+			HOST_MISS_MSG,
+			RF_MISS_MSG,
+			HOST_CURRENT_MSG,
+			RF_CURRENT_MSG
+		] = decode(buffer, SMUSH_MAP_MAILBOX_CONTROL)
+
+		return {
+			mailboxEnabled: MB_EN === BIT_SET,
+			hostPutMessage: HOST_PUT_MSG === BIT_SET,
+			rfPutMessage: RF_PUT_MSG === BIT_SET,
+			hostMissedMessage: HOST_MISS_MSG === BIT_SET,
+			rfMissedMessage: RF_MISS_MSG === BIT_SET,
+			currentFromRF: HOST_CURRENT_MSG === BIT_SET,
+			currentFromHost: RF_CURRENT_MSG === BIT_SET
+		}
+	}
+
+	/**
+	 * @param {MailboxControl} control
+	 * @returns {ArrayBuffer|ArrayBufferView}
+	 */
+	static encodeMailboxControl(control) {
+		throw new Error('no implementation')
+
+	}
+
+	/**
+	 * @param {ArrayBuffer|ArrayBufferView} buffer
+	 * @return {number}
+	 */
+	static decodeMailboxLength(buffer) {
+		const u8 = ArrayBuffer.isView(buffer) ?
+			new Uint8Array(buffer.buffer, buffer.byteOffset, LENGTH_SINGLE_BYTE) :
+			new Uint8Array(buffer, 0, LENGTH_SINGLE_BYTE)
+
+		const [ data ] = u8
+
+		return data + 1
+	}
 }
