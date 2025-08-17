@@ -299,8 +299,8 @@ export class ST25DV {
 	#system
 
 	constructor(userBus, systemBus) {
-		this.#user = userBus
-		this.#system = systemBus
+		this.#user = new ST25DVUser(userBus)
+		this.#system = new ST25DVSystem(systemBus)
 	}
 
 	get user() { return this.#user }
