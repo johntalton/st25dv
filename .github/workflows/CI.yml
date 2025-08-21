@@ -1,10 +1,13 @@
 name: CI
+permissions:
+  contents: read
+  pull-requests: write
 on: [ push, pull_request ]
 jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
     - run: npm install
     - run: npm run build --if-present

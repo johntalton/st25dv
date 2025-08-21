@@ -2,9 +2,16 @@ import { CommonSystem } from './common_system.js'
 import { CommonUser } from './common_user.js'
 import { Converter } from './converter.js'
 
+/**
+ * @import { I2CAddressedBus } from '@johntalton/and-other-delights'
+ */
+
 export class ST25DVUser {
 	#bus
 
+	/**
+	 * @param {I2CAddressedBus} bus
+	 */
 	constructor(bus) { this.#bus = bus }
 
 	async getGPO() {
