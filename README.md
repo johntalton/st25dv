@@ -1,8 +1,11 @@
 # ST25DV
 
-![CI](https://github.com/johntalton/st25dv/workflows/CI/badge.svg)
-
 Dynamic NFC/RFID tag javascript driver over abstracted [`I2CBus`](https://github.com/johntalton/and-other-delights) implementation.
+
+[![npm Version](http://img.shields.io/npm/v/@johntalton/st25dv.svg)](https://www.npmjs.com/package/@johntalton/st25dv)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/johntalton/st25dv)
+[![CI](https://github.com/johntalton/st25dv/actions/workflows/CI.yml/badge.svg)](https://github.com/johntalton/st25dv/actions/workflows/CI.yml)
+
 
 Obligatory [Adafruit](https://www.adafruit.com/product/4701)
 
@@ -32,7 +35,7 @@ const uid = await device.getUID()
 
 ### Wrapper class
 
-Using the same example as above while utalizing teh wrapper `ST25DV` class
+Using the same example as above while utilizing teh wrapper `ST25DV` class
 
 ```javascript
 const bus = /* again, some I2CBus, such as the MCP2221  */
