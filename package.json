@@ -1,6 +1,7 @@
 {
   "name": "@johntalton/st25dv",
-  "version": "1.2.0",
+  "version": "1.2.1",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.js"
@@ -12,5 +13,8 @@
   "devDependencies": {
     "@johntalton/and-other-delights": "^8.5.3",
     "@johntalton/ndef": "^1.0.1"
+  },
+  "repository": {
+    "url": "https://github.com/johntalton/st25dv"
   }
 }
